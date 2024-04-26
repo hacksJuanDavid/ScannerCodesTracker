@@ -1,0 +1,7 @@
+{
+  "name": "ScannerCodesWithCameraApp",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
