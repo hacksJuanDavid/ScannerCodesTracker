@@ -78,7 +78,7 @@ export default function ScannerCodesWithCamera() {
                 </IonCardContent>
             </IonCard>
             {/* GetGeolocation component */}
-            {scanningDone && <GetGeolocation />}
+            {<GetGeolocation />}
         </div>
     );
 }
