@@ -1,5 +1,5 @@
 import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent } from "@ionic/react";
-import RewardBigMacCombo from "../../../public/images/rewardBigMacCombo.png"
+import RewardBigMacCombo from "/images/rewardBigMacCombo.png"
 
 // Component rewarForUser
 export default function RewarForUser() {
