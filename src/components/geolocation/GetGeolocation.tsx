@@ -8,7 +8,7 @@ const Map = lazy(() => import('./Map'));
 // Component GetGeolocation
 export default function GetGeolocation() {
     // State to store geolocation
-    const [geolocation, setGeolocation] = useState<any>();
+    const [geolocation, setGeolocation] = useState<any>(null);
 
     // Function to get current position
     const getCurrentPosition = async () => {
