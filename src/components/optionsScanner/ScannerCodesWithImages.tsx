@@ -53,7 +53,8 @@ export default function ScannerCodesWithImages() {
             console.error('Error scanning barcode:', error);
         }
     };
-
+    
+    // Render
     return (
         <div>
             <IonCard>
