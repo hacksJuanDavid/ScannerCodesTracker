@@ -2,19 +2,14 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useDataQrStore } from '../../store/DataQrStore';
 import RoutingMap from './RoutingMap';
-import RewarForUser from '../rewards/rewardForUser';
+import RewarForUser from '../rewards/RewardForUser';
 
-// Custom marker
-L.Marker.prototype.options.icon = L.icon({
-    iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png"
-});
-
-// Componente Map
-export default function Map({ geoData }: any) {
-    // State to waypoints coordinates
-    const [waypoints, setWaypoints] = useState<any>([
+/*
+Example coords
+[
         {
             coords: {
                 latitude: 3.425248,
@@ -39,28 +34,61 @@ export default function Map({ geoData }: any) {
                 longitude: -76.5285156
             }
         }
-    ]);
+    ]
+*/
+
+// Custom marker
+L.Marker.prototype.options.icon = L.icon({
+    iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png"
+});
+
+// Componente Map
+export default function Map() {
+    // Use store DataQrStore
+    const { dataQRs } = useDataQrStore();
+    // State to waypoints coordinates
+    const [waypoints, setWaypoints] = useState<any>([]);
     // State to count waypoints
-    const [count, setCount] = useState<number>(waypoints.length);
+    const [count, setCount] = useState<number>(0);
+
+    // useEffect to set waypoints
+    useEffect(() => {
+        setWaypoints(dataQRs);
+        setCount(dataQRs.length);
+    }, [dataQRs]);
 
     // Render map
     return (
         <div>
-            <MapContainer center={[waypoints[0].coords.latitude, waypoints[0].coords.longitude]} zoom={12} style={{ height: "1000px" }}>
-                <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                {/* Render markers */}
+            {/* Geo data */}
+            <h2>Geo Data</h2>
+            <ul>
                 {waypoints.map((waypoint: any, index: number) => (
-                    <Marker key={index} position={[waypoint.coords.latitude, waypoint.coords.longitude]} />
+                    <li key={index}>
+                        <p>Latitude: {waypoint.coords.latitude}</p>
+                        <p>Longitude: {waypoint.coords.longitude}</p>
+                    </li>
                 ))}
+            </ul>
 
-                {/* Render routing */}
-                <RoutingMap />
-            </MapContainer>
+            {/* Verfiy if exist coord after rendering MapContainer */}
+            {waypoints.length > 0 && (
+                <MapContainer center={[waypoints[0].coords.latitude, waypoints[0].coords.longitude]} zoom={12} style={{ height: "500px" }}>
+                    <TileLayer
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    {/* Render markers */}
+                    {waypoints.map((waypoint: any, index: number) => (
+                        <Marker key={index} position={[waypoint.coords.latitude, waypoint.coords.longitude]} />
+                    ))}
+
+                    {/* Render routing */}
+                    <RoutingMap />
+                </MapContainer>
+            )}
             {/* Render reward for user */}
-            { count === 4 && <RewarForUser />}
+            {count === 4 && <RewarForUser />}
         </div>
     );
 }
