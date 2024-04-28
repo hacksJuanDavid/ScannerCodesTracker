@@ -16,12 +16,6 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
-    buildFeatures {
-      dataBinding true
-    }
-    dataBinding {
-      enabled = true
-    }
     buildTypes {
         release {
             minifyEnabled false
