@@ -1,15 +1,24 @@
 import { IonButton, IonCard, IonCardContent, IonCardTitle, IonGrid, IonRow, IonText } from '@ionic/react';
-import { useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Barcode, BarcodeFormat, BarcodeScanner } from '@capacitor-mlkit/barcode-scanning';
 import { FilePicker } from '@capawesome/capacitor-file-picker';
-import GetGeolocation from '../geolocation/GetGeolocation';
+import { useDataQrStore } from '../../store/DataQrStore';
+import { nanoid } from 'nanoid';
+import { Geolocation } from '@capacitor/geolocation';
+
+// Component Map 
+const Map = lazy(() => import('../geolocation/Map'));
 
 // Component ScannerCodesWithImages
 export default function ScannerCodesWithImages() {
+    // Use store DataQrStore
+    const { dataQRs, addDataQR } = useDataQrStore();
     // State to store barcode results
     const [barcodeResults, setBarcodeResults] = useState<Barcode[]>([]);
     // State to track if scanning has been done
     const [scanningDone, setScanningDone] = useState<boolean>(false);
+    // State to store geolocation
+    const [geolocation, setGeolocation] = useState<any>(null);
 
     // Function to handle file selection and barcode scanning
     const handleScanBarcodeFromImage = async () => {
@@ -53,7 +62,40 @@ export default function ScannerCodesWithImages() {
             console.error('Error scanning barcode:', error);
         }
     };
-    
+
+    // Function to get current position
+    const getCurrentPosition = async () => {
+        try {
+            // Get current position
+            const position = await Geolocation.getCurrentPosition();
+            // Set geolocation
+            setGeolocation(position);
+        } catch (error) {
+            console.error('Error getting current position:', error);
+        }
+    };
+
+    // UseEffect to add scanned barcode to store
+    useEffect(() => {
+        // Call getCurrentPosition function
+        getCurrentPosition();
+
+        // Check if barcode results exist and add to store
+        if (barcodeResults.length > 0) {
+            barcodeResults.forEach((barcode) => {
+                addDataQR({
+                    id: nanoid(),
+                    dataQRContent: barcode.rawValue,
+                    date: new Date().toISOString(),
+                    coords: {
+                        latitude: geolocation.coords.latitude,
+                        longitude: geolocation.coords.longitude
+                    }
+                });
+            });
+        }
+    }, [barcodeResults]);
+
     // Render
     return (
         <div>
@@ -77,8 +119,11 @@ export default function ScannerCodesWithImages() {
                     )}
                 </IonCardContent>
             </IonCard>
-            {/* GetGeolocation component */}
-            {scanningDone && <GetGeolocation />}
+            { scanningDone && (
+                <Suspense fallback={<div>Loading...</div>}>
+                    {dataQRs && <Map/>}
+                </Suspense>
+            )}
         </div>
     );
 }

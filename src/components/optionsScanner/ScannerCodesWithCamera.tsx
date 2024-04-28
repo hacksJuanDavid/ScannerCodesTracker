@@ -1,14 +1,23 @@
-import { useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { IonButton, IonCard, IonCardContent, IonCardTitle, IonCol, IonGrid, IonRow, IonText } from '@ionic/react';
 import { BarcodeScanner, BarcodeFormat, Barcode } from '@capacitor-mlkit/barcode-scanning';
-import GetGeolocation from '../geolocation/GetGeolocation';
+import { useDataQrStore } from '../../store/DataQrStore';
+import { nanoid } from 'nanoid';
+import { Geolocation } from '@capacitor/geolocation';
+
+// Component Map 
+const Map = lazy(() => import('../geolocation/Map'));
 
 // Component ScannerCodesWithCamera
 export default function ScannerCodesWithCamera() {
+    // Use store DataQrStore
+    const { dataQRs, addDataQR } = useDataQrStore();
     // State to store barcode results
     const [barcodeResults, setBarcodeResults] = useState<Barcode[]>([]);
     // State to track if scanning has been done
     const [scanningDone, setScanningDone] = useState<boolean>(false);
+    // State to store geolocation
+    const [geolocation, setGeolocation] = useState<any>(null);
 
     // Function to handle barcode scanning
     const scan = async () => {
@@ -46,6 +55,41 @@ export default function ScannerCodesWithCamera() {
         return camera;
     };
 
+    // Function to get current position
+    const getCurrentPosition = async () => {
+        try {
+            // Get current position
+            const position = await Geolocation.getCurrentPosition();
+            // Set geolocation
+            setGeolocation(position);
+        } catch (error) {
+            console.error('Error getting current position:', error);
+        }
+    };
+
+
+
+    // UseEffect to add scanned barcode to store
+    useEffect(() => {
+        // Call getCurrentPosition function
+        getCurrentPosition();
+
+        // Check if barcode results exist and add to store
+        if (barcodeResults.length > 0) {
+            barcodeResults.forEach((barcode) => {
+                addDataQR({
+                    id: nanoid(),
+                    dataQRContent: barcode.rawValue,
+                    date: new Date().toISOString(),
+                    coords: {
+                        latitude: geolocation.coords.latitude,
+                        longitude: geolocation.coords.longitude
+                    }
+                });
+            });
+        }
+    }, [barcodeResults]);
+
     // Render
     return (
         <div>
@@ -77,8 +121,11 @@ export default function ScannerCodesWithCamera() {
                     )}
                 </IonCardContent>
             </IonCard>
-            {/* GetGeolocation component */}
-            {<GetGeolocation />}
+            {scanningDone && (
+                <Suspense fallback={<div>Loading...</div>}>
+                    {dataQRs && <Map />}
+                </Suspense>
+            )}
         </div>
     );
 }
