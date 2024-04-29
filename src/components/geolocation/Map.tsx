@@ -1,41 +1,12 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine';
-import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Tooltip } from 'react-leaflet';
 import { useEffect, useState } from 'react';
 import { useDataQrStore } from '../../store/DataQrStore';
 import RoutingMap from './RoutingMap';
 import RewarForUser from '../rewards/RewardForUser';
-
-/*
-Example coords
-[
-        {
-            coords: {
-                latitude: 3.425248,
-                longitude: -76.5229917
-            }
-        },
-        {
-            coords: {
-                latitude: 3.450099,
-                longitude: -76.5485156
-            }
-        },
-        {
-            coords: {
-                latitude: 3.392099,
-                longitude: -76.5485156
-            }
-        },
-        {
-            coords: {
-                latitude: 3.342099,
-                longitude: -76.5285156
-            }
-        }
-    ]
-*/
+import { IonCard, IonCardTitle, IonCol, IonGrid, IonInput, IonItem, IonRow } from '@ionic/react';
 
 // Custom marker
 L.Marker.prototype.options.icon = L.icon({
@@ -60,16 +31,41 @@ export default function Map() {
     // Render map
     return (
         <div>
-            {/* Geo data */}
-            <h2>Geo Data</h2>
-            <ul>
-                {waypoints.map((waypoint: any, index: number) => (
-                    <li key={index}>
-                        <p>Latitude: {waypoint.coords.latitude}</p>
-                        <p>Longitude: {waypoint.coords.longitude}</p>
-                    </li>
+            {/* Geo data list info */}
+            <IonCard>
+                <IonCardTitle className='ion-text-center'>Geo Data List Info</IonCardTitle>
+                {dataQRs.map((dataQR: any, index: number) => (
+                    <IonGrid key={index}>
+                        <IonCard>
+                            <IonRow>
+                                <IonCol sizeXs='12'>
+                                    <IonItem>Id: {dataQR.id}</IonItem>
+                                </IonCol>
+                                <IonCol sizeXs='12'>
+                                    <IonItem>Data QR Content:
+                                        <IonInput value={dataQR.dataQRContent} readonly></IonInput>
+                                    </IonItem>
+                                </IonCol>
+                                <IonCol sizeXs='12'>
+                                    <IonItem>Date: {dataQR.date}</IonItem>
+                                </IonCol>
+                                <IonCol sizeXs='12'>
+                                    <IonItem>Country: {dataQR.country}</IonItem>
+                                </IonCol>
+                                <IonCol sizeXs='12'>
+                                    <IonItem>City: {dataQR.city}</IonItem>
+                                </IonCol>
+                                <IonCol sizeXs='12'>
+                                    <IonItem>Latitude: {dataQR.coords.latitude}</IonItem>
+                                </IonCol>
+                                <IonCol sizeXs='12'>
+                                    <IonItem>Longitude: {dataQR.coords.longitude}</IonItem>
+                                </IonCol>
+                            </IonRow>
+                        </IonCard>
+                    </IonGrid>
                 ))}
-            </ul>
+            </IonCard>
 
             {/* Verfiy if exist coord after rendering MapContainer */}
             {waypoints.length > 0 && (
@@ -80,7 +76,11 @@ export default function Map() {
                     />
                     {/* Render markers */}
                     {waypoints.map((waypoint: any, index: number) => (
-                        <Marker key={index} position={[waypoint.coords.latitude, waypoint.coords.longitude]} />
+                        <Marker key={index} position={[waypoint.coords.latitude, waypoint.coords.longitude]}>
+                            <Tooltip direction="top" offset={[0, -20]} opacity={1} permanent>
+                                <span>{index === 0 ? 'origin' : index === waypoints.length - 1 ? 'destiny' : index}</span>
+                            </Tooltip>
+                        </Marker>
                     ))}
 
                     {/* Render routing */}
