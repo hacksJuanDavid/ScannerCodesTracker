@@ -89,6 +89,7 @@ export default function ScannerCodesWithCamera() {
         }
     };
 
+    /*
     // Function to get current country
     const getCurrentCountryAndCity = async () => {
         try {
@@ -105,12 +106,12 @@ export default function ScannerCodesWithCamera() {
             console.error('Error getting current country:', error);
         }
     };
+    */
 
     // UseEffect to get current position and country
     useEffect(() => {
         if (scanningDone && barcodeResults.length > 0) {
             getCurrentPosition(); 
-            getCurrentCountryAndCity();
         }
     }, [scanningDone]);
 
@@ -123,6 +124,8 @@ export default function ScannerCodesWithCamera() {
                     id: nanoid(),
                     dataQRContent: barcode.rawValue,
                     date: new Date().toISOString(),
+                    country: "Colombia",
+                    city: "Perímetro Urbano Santiago de Cali",
                     coords: {
                         latitude: geolocation.coords.latitude,
                         longitude: geolocation.coords.longitude
