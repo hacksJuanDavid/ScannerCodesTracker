@@ -5,14 +5,6 @@ import { useMap } from "react-leaflet";
 import { useEffect, useState } from "react";
 import { useDataQrStore } from '../../store/DataQrStore';
 
-/*
-Exampl coords
-   L.latLng(3.425248, -76.5229917),
-   L.latLng(3.450099, -76.5485156),
-   L.latLng(3.392099, -76.5485156),
-   L.latLng(3.342099, -76.5285156)
-*/
-
 // RoutingMap component
 export default function RoutingMap() {
     // Use store DataQrStore
