@@ -18,9 +18,31 @@ export default function ScannerCodesWithCamera() {
     const [scanningDone, setScanningDone] = useState<boolean>(false);
     // State to store geolocation
     const [geolocation, setGeolocation] = useState<any>(null);
+    // State to store location info
+    const [locationInfo, setLocationInfo] = useState<any>(null);
+
+    // Function to check if Google Barcode Scanner module is available
+    const isGoogleBarcodeScannerModuleAvailable = async () => {
+        const { available } =
+            await BarcodeScanner.isGoogleBarcodeScannerModuleAvailable();
+        return available;
+    };
+
+    // Function to install Google Barcode Scanner module
+    const installGoogleBarcodeScannerModule = async () => {
+        await BarcodeScanner.installGoogleBarcodeScannerModule();
+    };
 
     // Function to handle barcode scanning
     const scan = async () => {
+        // Check if Google Barcode Scanner module is available
+        const available = await isGoogleBarcodeScannerModuleAvailable();
+        // If not available, install Google Barcode Scanner module
+        if (!available) {
+            await installGoogleBarcodeScannerModule();
+        }
+
+        // Scan barcodes
         const { barcodes } = await BarcodeScanner.scan({
             formats: [
                 BarcodeFormat.QrCode,
@@ -67,15 +89,35 @@ export default function ScannerCodesWithCamera() {
         }
     };
 
+    // Function to get current country
+    const getCurrentCountryAndCity = async () => {
+        try {
+            // Get current position
+            const position = await Geolocation.getCurrentPosition();
+            // Get city and country based on geolocation
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}&format=json`);
+            const data = await response.json();
+            const city = data.address.city;
+            const country = data.address.country;
+            // Set location info
+            setLocationInfo({ city, country });
+        } catch (error) {
+            console.error('Error getting current country:', error);
+        }
+    };
 
+    // UseEffect to get current position and country
+    useEffect(() => {
+        if (scanningDone && barcodeResults.length > 0) {
+            getCurrentPosition(); 
+            getCurrentCountryAndCity();
+        }
+    }, [scanningDone]);
 
     // UseEffect to add scanned barcode to store
     useEffect(() => {
-        // Call getCurrentPosition function
-        getCurrentPosition();
-
-        // Check if barcode results exist and add to store
-        if (barcodeResults.length > 0) {
+        // Verificar si hay resultados de código de barras y agregar al almacén
+        if (barcodeResults.length > 0 && geolocation) {
             barcodeResults.forEach((barcode) => {
                 addDataQR({
                     id: nanoid(),
@@ -88,7 +130,7 @@ export default function ScannerCodesWithCamera() {
                 });
             });
         }
-    }, [barcodeResults]);
+    }, [barcodeResults, geolocation]);
 
     // Render
     return (
@@ -128,4 +170,4 @@ export default function ScannerCodesWithCamera() {
             )}
         </div>
     );
-}
+}   
