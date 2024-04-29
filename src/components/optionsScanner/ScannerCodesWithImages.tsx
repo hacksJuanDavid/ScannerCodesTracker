@@ -123,7 +123,6 @@ export default function ScannerCodesWithImages() {
         }
     }, [barcodeResults, geolocation]);
 
-
     // Render
     return (
         <div>
