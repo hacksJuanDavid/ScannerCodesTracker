@@ -1,6 +1,6 @@
 import { IonContent, IonHeader, IonIcon, IonPage, IonTitle, IonToolbar } from '@ionic/react';
 import { scanOutline } from 'ionicons/icons';
-import ScannerCodes from '../components/ScannerCodes';
+import ScannerCodes from '../components/scanner/ScannerCodes';
 
 const Home: React.FC = () => {
   return (
