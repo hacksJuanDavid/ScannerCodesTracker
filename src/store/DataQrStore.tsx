@@ -1,24 +1,13 @@
 import { create } from "zustand";
 import { devtools, persist } from 'zustand/middleware';
 
-/*
-                    {
-                        id: '1',
-                        dataQRContent: 'Data QR 1',
-                        date: new Date().toISOString(),
-                        coords: {
-                            latitude: 3.425248,
-                            longitude: -76.5229917
-                        }
-                    },
-
-*/
-
 // Interface para el objeto dataQR
 interface DataQR {
     id: string;
     dataQRContent: string;
     date: string;
+    country: string;
+    city : string;
     coords: {
         latitude: number;
         longitude: number;
@@ -43,6 +32,8 @@ export const useDataQrStore = create<DataQrStore>()(
                         id: '1',
                         dataQRContent: 'Data QR 1',
                         date: new Date().toISOString(),
+                        country: 'Colombia',
+                        city : 'Perímetro Urbano Santiago de Cali',
                         coords: {
                             latitude: 3.450099,
                             longitude: -76.5485156
@@ -52,6 +43,8 @@ export const useDataQrStore = create<DataQrStore>()(
                         id: '2',
                         dataQRContent: 'Data QR 2',
                         date: new Date().toISOString(),
+                        country: 'Colombia',
+                        city : 'Perímetro Urbano Santiago de Cali',
                         coords: {
                             latitude: 3.392099,
                             longitude: -76.5485156
@@ -61,6 +54,8 @@ export const useDataQrStore = create<DataQrStore>()(
                         id: '3',
                         dataQRContent: 'Data QR 3',
                         date: new Date().toISOString(),
+                        country: 'Colombia',
+                        city : 'Perímetro Urbano Santiago de Cali',
                         coords: {
                             latitude: 3.342099,
                             longitude: -76.5285156
